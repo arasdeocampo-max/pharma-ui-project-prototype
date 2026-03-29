@@ -1,0 +1,7 @@
+[
+  { "id": 1, "name": "Paracetamol", "barcode": "PHS-1001", "price": 16, "stock": 120, "expiration": "2026-11-20", "shelf": "A1-02" },
+  { "id": 2, "name": "Amoxicillin", "barcode": "PHS-1002", "price": 42, "stock": 28, "expiration": "2026-07-15", "shelf": "B2-01" },
+  { "id": 3, "name": "Vitamin C", "barcode": "PHS-1003", "price": 18, "stock": 94, "expiration": "2027-01-10", "shelf": "A3-04" },
+  { "id": 4, "name": "Ibuprofen", "barcode": "PHS-1004", "price": 24, "stock": 14, "expiration": "2026-06-02", "shelf": "B1-03" },
+  { "id": 5, "name": "Cetirizine", "barcode": "PHS-1005", "price": 21, "stock": 6, "expiration": "2026-05-12", "shelf": "C1-06" }
+]
