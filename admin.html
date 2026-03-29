@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-page="admin-dashboard" data-role="admin">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PharmaSys | Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+  <div id="appShell"></div>
+  <main class="main-content">
+    <div class="container-fluid p-4 p-lg-5">
+      <div class="row g-4 align-items-stretch mb-4">
+        <div class="col-xl-8">
+          <div class="hero-banner card border-0 shadow-sm h-100">
+            <div class="card-body p-4 p-xl-5">
+              <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start">
+                <div>
+                  <span class="eyebrow">Admin Control Center</span>
+                  <h1 class="fw-bold mt-2 mb-3">Pharmacy operations overview at a glance</h1>
+                  <p class="text-muted mb-4">Monitor inventory movement, user access, sales summaries, and urgent reorder activity from one polished dashboard.</p>
+                  <div class="d-flex flex-wrap gap-2">
+                    <a id="manageProductsBtn" href="products.html" class="btn btn-primary rounded-pill px-4"><i class="bi bi-box-seam me-2"></i>Manage Products</a>
+                    <a id="openReportsBtn" href="reports.html" class="btn btn-light rounded-pill px-4"><i class="bi bi-graph-up-arrow me-2"></i>Open Reports</a>
+                  </div>
+                </div>
+                <div class="hero-metric-card">
+                  <small class="text-uppercase text-muted">Revenue to date</small>
+                  <h2 class="fw-bold text-primary mb-0" id="adminRevenueValue">PHP 0.00</h2>
+                  <p class="text-success mb-0" id="adminRevenueMeta"><i class="bi bi-arrow-up-right"></i> Live local transaction total</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h5 class="fw-bold mb-1">Reorder Alerts</h5>
+                  <p class="text-muted mb-0">Priority stock actions</p>
+                </div>
+                <div class="d-flex gap-2">
+                  <button id="createReorderBtn" class="btn btn-success btn-sm rounded-pill">Create Order</button>
+                  <span class="badge rounded-pill bg-danger-subtle text-danger">Critical</span>
+                </div>
+              </div>
+              <div id="reorderList" class="d-grid gap-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4" id="statCards"></div>
+
+      <div class="row g-4">
+        <div class="col-12 col-xxl-8">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold mb-1">Inventory Performance</h5>
+                <p class="text-muted mb-0">Stock distribution by product status</p>
+              </div>
+              <button id="exportBtn" class="btn btn-light btn-sm rounded-pill"><i class="bi bi-download me-2"></i>Export</button>
+            </div>
+            <div class="card-body px-4 pb-4 pt-0">
+              <canvas id="inventoryChart" height="120"></canvas>
+            </div>
+          </div>
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold mb-1">User Management</h5>
+                <p class="text-muted mb-0">Role permissions and account status overview</p>
+              </div>
+              <button id="openUserModalBtn" class="btn btn-primary btn-sm rounded-pill"><i class="bi bi-person-plus me-2"></i>Add User</button>
+            </div>
+            <div class="card-body pt-0 px-4 pb-4">
+              <div class="table-responsive">
+                <table class="table align-middle modern-table" id="userManagementTable"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-xxl-4">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h5 class="fw-bold mb-1">Notifications</h5>
+                  <p class="text-muted mb-0">System highlights</p>
+                </div>
+                <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-bell"></i></button>
+              </div>
+              <div id="notificationList" class="timeline-list"></div>
+            </div>
+          </div>
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold mb-1">Quick Reports</h5>
+                <p class="text-muted mb-0">Snapshot of key metrics</p>
+              </div>
+            </div>
+            <div class="card-body pt-0 px-4 pb-4">
+              <div class="list-group gap-3">
+                <div class="list-group-item border rounded-4 report-card">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="fw-semibold mb-1">Daily Sales</h6>
+                      <p class="text-muted mb-0" id="quickSalesText">0 transactions processed today</p>
+                    </div>
+                    <span class="badge text-bg-primary rounded-pill" id="quickSalesValue">PHP 0.00</span>
+                  </div>
+                </div>
+                <div class="list-group-item border rounded-4 report-card">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="fw-semibold mb-1">Inventory Health</h6>
+                      <p class="text-muted mb-0" id="quickInventoryText">0 items below threshold</p>
+                    </div>
+                    <span class="badge text-bg-warning rounded-pill" id="quickInventoryBadge">Stable</span>
+                  </div>
+                </div>
+                <div class="list-group-item border rounded-4 report-card">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="fw-semibold mb-1">Expiry Watch</h6>
+                      <p class="text-muted mb-0" id="quickExpiryText">0 products expire within 60 days</p>
+                    </div>
+                    <span class="badge text-bg-dark rounded-pill" id="quickExpiryBadge">Clear</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold mb-1">Recent Audit Trail</h5>
+                <p class="text-muted mb-0">Latest user, login, and catalog activity</p>
+              </div>
+              <a href="reports.html" class="btn btn-light btn-sm rounded-pill"><i class="bi bi-clock-history me-2"></i>Open Full Trail</a>
+            </div>
+            <div class="card-body pt-0 px-4 pb-4">
+              <div id="recentAuditList" class="timeline-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <div>
+            <h5 class="modal-title fw-bold" id="userModalTitle">Add user</h5>
+            <p class="text-muted small mb-0" id="userModalCaption">Create a new account for this local demo workspace.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-3">
+          <form id="userForm">
+            <input type="hidden" id="userIdInput">
+            <div class="mb-3">
+              <label for="userNameInput" class="form-label">Full Name</label>
+              <input type="text" class="form-control form-control-lg" id="userNameInput" placeholder="Enter full name" required>
+            </div>
+            <div class="mb-3">
+              <label for="userUsernameInput" class="form-label">Username</label>
+              <input type="text" class="form-control form-control-lg" id="userUsernameInput" placeholder="Enter username" required>
+            </div>
+            <div class="mb-3">
+              <label for="userEmailInput" class="form-label">Email</label>
+              <input type="email" class="form-control form-control-lg" id="userEmailInput" placeholder="Enter email" required>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="userRoleInput" class="form-label">Role</label>
+                <select id="userRoleInput" class="form-select form-select-lg" required>
+                  <option value="admin">Admin</option>
+                  <option value="pharmacist">Pharmacist</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="userStatusInput" class="form-label">Status</label>
+                <select id="userStatusInput" class="form-select form-select-lg" required>
+                  <option value="Active">Active</option>
+                  <option value="Idle">Idle</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-3 mb-4">
+              <label for="userShiftInput" class="form-label">Shift</label>
+              <input type="text" class="form-control form-control-lg" id="userShiftInput" placeholder="Example: 8:00 AM - 5:00 PM" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-3" id="saveUserBtn">Create User</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-page="pharmacist-dashboard" data-role="pharmacist">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PharmaSys | Pharmacist Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+  <div id="appShell"></div>
+  <main class="main-content">
+    <div class="container-fluid p-4 p-lg-5">
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm p-4 hero-banner">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+              <div>
+                <span class="eyebrow">Pharmacist Workspace</span>
+                <h1 class="fw-bold mt-2 mb-2">Medication oversight with guided daily actions</h1>
+                <p class="text-muted mb-0">Review stock health, monitor product expiry, and support safe dispensing with streamlined workflows.</p>
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                <a href="inventory.html" class="btn btn-primary rounded-pill"><i class="bi bi-clipboard2-pulse me-2"></i>Inventory Board</a>
+                <a href="sales.html" class="btn btn-light rounded-pill"><i class="bi bi-cart3 me-2"></i>Sales Access</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4 mb-4" id="pharmacistStats"></div>
+      <div class="row g-4">
+        <div class="col-xl-7">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 p-4">
+              <h5 class="fw-bold mb-1">Expiration Tracking</h5>
+              <p class="text-muted mb-0">Products that need pharmacist attention soon</p>
+            </div>
+            <div class="card-body pt-0 px-4 pb-4">
+              <div class="table-responsive">
+                <table class="table modern-table align-middle" id="expiryTable"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-5">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-1">Stock Adjustment Queue</h5>
+              <p class="text-muted mb-4">Review pending quantity updates before approval.</p>
+              <div class="queue-card mb-3">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                  <h6 class="fw-semibold mb-1">Reorder Workflow</h6>
+                  <p class="text-muted mb-0">Manage items that need restocking.</p>
+                </div>
+                <button id="createReorderBtn" class="btn btn-success btn-sm rounded-pill">Create Order</button>
+              </div>
+              <div class="queue-card mb-3">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                  <div>
+                    <h6 class="fw-semibold mb-1">Cetirizine</h6>
+                    <p class="text-muted mb-0">Adjust -5 units after damaged packaging report.</p>
+                  </div>
+                  <span class="badge text-bg-warning rounded-pill">Review</span>
+                </div>
+              </div>
+              <button class="btn btn-success rounded-pill w-100"><i class="bi bi-check2-circle me-2"></i>Approve Selected Adjustments</button>
+            </div>
+          </div>
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-1">Pharmacist Checklist</h5>
+              <p class="text-muted mb-4">Suggested daily routine for presentation simulation.</p>
+              <ul class="checklist list-unstyled d-grid gap-3 mb-0">
+                <li><i class="bi bi-check-circle-fill text-success"></i> Verify low-stock medications before opening shift.</li>
+                <li><i class="bi bi-check-circle-fill text-success"></i> Review prescriptions pending for fulfillment.</li>
+                <li><i class="bi bi-check-circle-fill text-success"></i> Inspect nearing-expiry product batches.</li>
+                <li><i class="bi bi-check-circle-fill text-success"></i> Coordinate with staff on fast-moving item replenishment.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
