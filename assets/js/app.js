@@ -751,7 +751,7 @@ function getReportSections() {
     {
       key: 'expiration',
       title: 'Expiration Report',
-      description: 'Monitor soon-to-expire medicine batches',
+      description: 'Monitor soon-to-expire supply batches',
       tableHeadHtml: '<tr><th>Product</th><th>Expiration Date</th><th>Days Remaining</th><th>Recommended Action</th></tr>',
       tableBodyHtml: expirationRows
     },
@@ -890,6 +890,8 @@ const routes = {
 const navByRole = {
   admin: [
     { href: 'admin.html', label: 'Dashboard', icon: 'bi-grid-1x2' },
+    { href: 'admin.html#usersSection', label: 'Users', icon: 'bi-people' },
+    { href: 'reorder.html', label: 'Reorder', icon: 'bi-arrow-repeat' },
     { href: 'products.html', label: 'Products', icon: 'bi-box-seam' },
     { href: 'inventory.html', label: 'Inventory', icon: 'bi-clipboard2-pulse' },
     { href: 'reports.html', label: 'Reports', icon: 'bi-graph-up-arrow' },
@@ -897,6 +899,7 @@ const navByRole = {
   ],
   pharmacist: [
     { href: 'pharmacist.html', label: 'Dashboard', icon: 'bi-speedometer2' },
+    { href: 'reorder.html', label: 'Reorder', icon: 'bi-arrow-repeat' },
     { href: 'products.html', label: 'Products', icon: 'bi-capsule' },
     { href: 'inventory.html', label: 'Inventory', icon: 'bi-clipboard2-data' },
     { href: 'sales.html', label: 'Sales Access', icon: 'bi-bag-check' },
@@ -1013,16 +1016,41 @@ function renderShell() {
           </div>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 gap-lg-3">
-          <div class="search-pill"><i class="bi bi-bell me-2"></i>${notificationCount} notification${notificationCount === 1 ? '' : 's'}</div>
-          <button class="btn btn-light rounded-pill" id="themeToggle"><i class="bi bi-moon-stars me-2"></i>Dark mode</button>
-          <div class="d-flex align-items-center gap-2">
-            <div class="avatar-chip">${name.slice(0, 1).toUpperCase()}</div>
-            <div>
-              <div class="fw-semibold">${name}</div>
-              <small class="text-muted text-capitalize">${role}</small>
-            </div>
+          <div class="dropdown">
+            <button class="btn btn-light rounded-pill position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-bell me-2"></i>Notifications
+              <span class="badge rounded-pill text-bg-primary ms-1">${notificationCount}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2" style="min-width: 320px;">
+              ${dataStore.notifications.slice(0, 5).map((note) => `
+                <li>
+                  <div class="dropdown-item rounded-3 py-2 px-3">
+                    <div class="fw-semibold">${note.title}</div>
+                    <div class="small text-muted">${note.message}</div>
+                  </div>
+                </li>
+              `).join('')}
+              ${dataStore.notifications.length ? '<li><hr class="dropdown-divider"></li>' : ''}
+              <li><a class="dropdown-item rounded-3 fw-semibold text-primary" href="reports.html">View all notifications</a></li>
+            </ul>
           </div>
-          <a href="index.html" class="btn btn-outline-secondary rounded-pill" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
+          <button class="btn btn-light rounded-pill" id="themeToggle"><i class="bi bi-moon-stars me-2"></i>Dark mode</button>
+          <div class="dropdown">
+            <button class="btn btn-light rounded-pill d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="avatar-chip">${name.slice(0, 1).toUpperCase()}</div>
+              <div class="text-start">
+                <div class="fw-semibold">${name}</div>
+                <small class="text-muted text-capitalize">${role}</small>
+              </div>
+              <i class="bi bi-chevron-down small"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2">
+              <li><a class="dropdown-item rounded-3" href="admin.html"><i class="bi bi-person-circle me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item rounded-3" href="reports.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a href="index.html" class="dropdown-item rounded-3 text-danger" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </header>
@@ -1083,10 +1111,10 @@ function renderLiveDashboardStats(hostId) {
   if (user.role === 'staff') {
     const getStock = (name) => dataStore.products.find((p) => p.name.toLowerCase() === name.toLowerCase())?.stock || 0;
     renderStatCards(hostId, [
-      { label: 'Amoxicillin Stock', value: getStock('Amoxicillin'), icon: 'bi-capsule', bg: 'rgba(37,99,235,0.12)', color: '#2563eb', note: 'Staff limited view' },
-      { label: 'Ibuprofen Stock', value: getStock('Ibuprofen'), icon: 'bi-droplet', bg: 'rgba(22,163,74,0.14)', color: '#15803d', note: 'Staff limited view' },
-      { label: 'Cetirizine Stock', value: getStock('Cetirizine'), icon: 'bi-gear', bg: 'rgba(245,158,11,0.14)', color: '#d97706', note: 'Staff limited view' },
-      { label: 'Total Sales', value: peso(getStats().totalSales), icon: 'bi-cash-stack', bg: 'rgba(99,102,241,0.14)', color: '#4f46e5', note: 'Key staff reporting figure' }
+      { label: 'BP Monitor Stock', value: getStock('Digital BP Monitor'), icon: 'bi-heart-pulse', bg: 'rgba(37,99,235,0.12)', color: '#2563eb', note: 'Monitoring device supply' },
+      { label: 'Sugar Strips Stock', value: getStock('Glucometer Test Strips (50s)'), icon: 'bi-droplet-half', bg: 'rgba(22,163,74,0.14)', color: '#15803d', note: 'Sugar-check consumables' },
+      { label: 'Patient Bed Stock', value: getStock('Hospital Bed Mattress'), icon: 'bi-hospital', bg: 'rgba(245,158,11,0.14)', color: '#d97706', note: 'Bulky medical supplies' },
+      { label: 'Total Sales', value: peso(getStats().totalSales), icon: 'bi-cash-stack', bg: 'rgba(99,102,241,0.14)', color: '#4f46e5', note: 'All supply transactions' }
     ]);
     return;
   }
@@ -1532,6 +1560,12 @@ function renderPharmacist() {
 
 function renderStaff() {
   renderLiveDashboardStats('staffStats');
+  const bpCountValue = document.getElementById('bpCountValue');
+  const sugarCountValue = document.getElementById('sugarCountValue');
+  const todaySummary = getTodaySalesSummary();
+  if (bpCountValue) bpCountValue.textContent = String(12 + todaySummary.transactions);
+  if (sugarCountValue) sugarCountValue.textContent = String(9 + Math.max(1, Math.floor(todaySummary.transactions / 2)));
+
   const grid = document.getElementById('quickProductGrid');
   if (grid) {
     grid.innerHTML = dataStore.products.map((item) => `
@@ -1669,7 +1703,7 @@ function renderProducts() {
     }
 
     if (modalTitle) modalTitle.textContent = 'Add Product';
-    if (modalCaption) modalCaption.textContent = 'Create a new medicine record in the catalog.';
+    if (modalCaption) modalCaption.textContent = 'Create a new supply record in the catalog.';
     if (saveButton) saveButton.textContent = 'Save Product';
   };
 
@@ -1932,6 +1966,55 @@ function renderInventory() {
         </div>
       </div>`).join('');
   }
+}
+
+function renderReorder() {
+  const reorderTable = document.getElementById('reorderTable');
+  if (!reorderTable) return;
+
+  const lowStockItems = dataStore.products
+    .filter((item) => item.stock <= 20)
+    .sort((a, b) => a.stock - b.stock);
+
+  reorderTable.innerHTML = `
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Current Stock</th>
+        <th>Level</th>
+        <th>Suggested Reorder Qty</th>
+        <th>Shelf</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${lowStockItems.length ? lowStockItems.map((item) => `
+        <tr class="${item.stock <= 8 ? 'table-danger' : 'table-warning'}">
+          <td>${item.name}</td>
+          <td>${item.stock}</td>
+          <td><span class="badge ${item.stock <= 8 ? 'bg-danger' : 'bg-warning text-dark'} rounded-pill">${item.stock <= 8 ? 'Critical' : 'Low'}</span></td>
+          <td>${Math.max(40 - item.stock, 12)} units</td>
+          <td>${item.shelf}</td>
+          <td><button class="btn btn-sm btn-success rounded-pill reorder-btn" data-id="${item.id}"><i class="bi bi-bag-plus me-1"></i>Create Reorder</button></td>
+        </tr>
+      `).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">No low stock items at the moment.</td></tr>'}
+    </tbody>
+  `;
+
+  reorderTable.querySelectorAll('.reorder-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      const item = getProductById(button.dataset.id);
+      if (!item) return;
+      recordAudit('Reorder request created', {
+        module: 'Inventory',
+        details: `Requested reorder for ${item.name} (${Math.max(40 - item.stock, 12)} units).`,
+        level: item.stock <= 8 ? 'warning' : 'info'
+      });
+      addNotification('Reorder request sent', `${item.name} reorder created successfully.`, 'info');
+      saveDataStore();
+      showToast(`Reorder request created for ${item.name}.`, 'success');
+    });
+  });
 }
 
 function persistCart() {
@@ -2275,7 +2358,7 @@ function renderSales() {
     saveDataStore();
     document.getElementById('receiptContent').innerHTML = `
       <div class="text-center mb-3">
-        <h5 class="fw-bold mb-1">PharmaSys Pharmacy</h5>
+        <h5 class="fw-bold mb-1">PharmaSys Supplies</h5>
         <p class="text-muted mb-0">Receipt | ${new Date().toLocaleString()}</p>
       </div>
       <div class="d-grid gap-2 mb-3">
@@ -2288,7 +2371,7 @@ function renderSales() {
       <div class="d-flex justify-content-between"><span>Payment Method</span><span>${paymentMethod.toUpperCase()}</span></div>
       ${paymentMethod === 'cash' ? `<div class="d-flex justify-content-between"><span>Paid</span><span>${peso(payment)}</span></div>
       <div class="d-flex justify-content-between"><span>Change</span><span>${peso(payment - total)}</span></div>` : ''}
-      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>RX items dispensed - prescription verified.</div>' : ''}
+      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>Regulated items released - compliance check verified.</div>' : ''}
       <div class="alert alert-success border-0 rounded-4 mt-3 mb-0 text-center">Transaction completed successfully.</div>
     `;
     new bootstrap.Modal(document.getElementById('receiptModal')).show();
@@ -2375,7 +2458,7 @@ function renderSales() {
     saveDataStore();
     document.getElementById('receiptContent').innerHTML = `
       <div class="text-center mb-3">
-        <h5 class="fw-bold mb-1">PharmaSys Pharmacy</h5>
+        <h5 class="fw-bold mb-1">PharmaSys Supplies</h5>
         <p class="text-muted mb-0">Receipt ${receiptId} | ${new Date(createdAt).toLocaleString()}</p>
       </div>
       <div class="d-grid gap-2 mb-3">
@@ -2388,7 +2471,7 @@ function renderSales() {
       <div class="d-flex justify-content-between"><span>Payment Method</span><span>${paymentMethod.toUpperCase()}</span></div>
       ${paymentMethod === 'cash' ? `<div class="d-flex justify-content-between"><span>Paid</span><span>${peso(payment)}</span></div>
       <div class="d-flex justify-content-between"><span>Change</span><span>${peso(change)}</span></div>` : ''}
-      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>RX items dispensed - prescription verified.</div>' : ''}
+      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>Regulated items released - compliance check verified.</div>' : ''}
       <div class="alert alert-success border-0 rounded-4 mt-3 mb-0 text-center">Transaction completed successfully.</div>
     `;
     new bootstrap.Modal(document.getElementById('receiptModal')).show();
@@ -2574,6 +2657,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (page === 'staff-dashboard') renderStaff();
   if (page === 'products') renderProducts();
   if (page === 'inventory') renderInventory();
+  if (page === 'reorder') renderReorder();
   if (page === 'sales') renderSales();
   if (page === 'reports') renderReports();
   applyRoleRestrictions();
