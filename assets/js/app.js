@@ -890,6 +890,8 @@ const routes = {
 const navByRole = {
   admin: [
     { href: 'admin.html', label: 'Dashboard', icon: 'bi-grid-1x2' },
+    { href: 'admin.html#usersSection', label: 'Users', icon: 'bi-people' },
+    { href: 'reorder.html', label: 'Reorder', icon: 'bi-arrow-repeat' },
     { href: 'products.html', label: 'Products', icon: 'bi-box-seam' },
     { href: 'inventory.html', label: 'Inventory', icon: 'bi-clipboard2-pulse' },
     { href: 'reports.html', label: 'Reports', icon: 'bi-graph-up-arrow' },
@@ -897,6 +899,7 @@ const navByRole = {
   ],
   pharmacist: [
     { href: 'pharmacist.html', label: 'Dashboard', icon: 'bi-speedometer2' },
+    { href: 'reorder.html', label: 'Reorder', icon: 'bi-arrow-repeat' },
     { href: 'products.html', label: 'Products', icon: 'bi-capsule' },
     { href: 'inventory.html', label: 'Inventory', icon: 'bi-clipboard2-data' },
     { href: 'sales.html', label: 'Sales Access', icon: 'bi-bag-check' },
@@ -1013,16 +1016,41 @@ function renderShell() {
           </div>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 gap-lg-3">
-          <div class="search-pill"><i class="bi bi-bell me-2"></i>${notificationCount} notification${notificationCount === 1 ? '' : 's'}</div>
-          <button class="btn btn-light rounded-pill" id="themeToggle"><i class="bi bi-moon-stars me-2"></i>Dark mode</button>
-          <div class="d-flex align-items-center gap-2">
-            <div class="avatar-chip">${name.slice(0, 1).toUpperCase()}</div>
-            <div>
-              <div class="fw-semibold">${name}</div>
-              <small class="text-muted text-capitalize">${role}</small>
-            </div>
+          <div class="dropdown">
+            <button class="btn btn-light rounded-pill position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-bell me-2"></i>Notifications
+              <span class="badge rounded-pill text-bg-primary ms-1">${notificationCount}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2" style="min-width: 320px;">
+              ${dataStore.notifications.slice(0, 5).map((note) => `
+                <li>
+                  <div class="dropdown-item rounded-3 py-2 px-3">
+                    <div class="fw-semibold">${note.title}</div>
+                    <div class="small text-muted">${note.message}</div>
+                  </div>
+                </li>
+              `).join('')}
+              ${dataStore.notifications.length ? '<li><hr class="dropdown-divider"></li>' : ''}
+              <li><a class="dropdown-item rounded-3 fw-semibold text-primary" href="reports.html">View all notifications</a></li>
+            </ul>
           </div>
-          <a href="index.html" class="btn btn-outline-secondary rounded-pill" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
+          <button class="btn btn-light rounded-pill" id="themeToggle"><i class="bi bi-moon-stars me-2"></i>Dark mode</button>
+          <div class="dropdown">
+            <button class="btn btn-light rounded-pill d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="avatar-chip">${name.slice(0, 1).toUpperCase()}</div>
+              <div class="text-start">
+                <div class="fw-semibold">${name}</div>
+                <small class="text-muted text-capitalize">${role}</small>
+              </div>
+              <i class="bi bi-chevron-down small"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2">
+              <li><a class="dropdown-item rounded-3" href="admin.html"><i class="bi bi-person-circle me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item rounded-3" href="reports.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a href="index.html" class="dropdown-item rounded-3 text-danger" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </header>
@@ -1934,6 +1962,55 @@ function renderInventory() {
   }
 }
 
+function renderReorder() {
+  const reorderTable = document.getElementById('reorderTable');
+  if (!reorderTable) return;
+
+  const lowStockItems = dataStore.products
+    .filter((item) => item.stock <= 20)
+    .sort((a, b) => a.stock - b.stock);
+
+  reorderTable.innerHTML = `
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Current Stock</th>
+        <th>Level</th>
+        <th>Suggested Reorder Qty</th>
+        <th>Shelf</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${lowStockItems.length ? lowStockItems.map((item) => `
+        <tr class="${item.stock <= 8 ? 'table-danger' : 'table-warning'}">
+          <td>${item.name}</td>
+          <td>${item.stock}</td>
+          <td><span class="badge ${item.stock <= 8 ? 'bg-danger' : 'bg-warning text-dark'} rounded-pill">${item.stock <= 8 ? 'Critical' : 'Low'}</span></td>
+          <td>${Math.max(40 - item.stock, 12)} units</td>
+          <td>${item.shelf}</td>
+          <td><button class="btn btn-sm btn-success rounded-pill reorder-btn" data-id="${item.id}"><i class="bi bi-bag-plus me-1"></i>Create Reorder</button></td>
+        </tr>
+      `).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">No low stock items at the moment.</td></tr>'}
+    </tbody>
+  `;
+
+  reorderTable.querySelectorAll('.reorder-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      const item = getProductById(button.dataset.id);
+      if (!item) return;
+      recordAudit('Reorder request created', {
+        module: 'Inventory',
+        details: `Requested reorder for ${item.name} (${Math.max(40 - item.stock, 12)} units).`,
+        level: item.stock <= 8 ? 'warning' : 'info'
+      });
+      addNotification('Reorder request sent', `${item.name} reorder created successfully.`, 'info');
+      saveDataStore();
+      showToast(`Reorder request created for ${item.name}.`, 'success');
+    });
+  });
+}
+
 function persistCart() {
   localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart));
 }
@@ -2574,6 +2651,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (page === 'staff-dashboard') renderStaff();
   if (page === 'products') renderProducts();
   if (page === 'inventory') renderInventory();
+  if (page === 'reorder') renderReorder();
   if (page === 'sales') renderSales();
   if (page === 'reports') renderReports();
   applyRoleRestrictions();
