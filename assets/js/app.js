@@ -1111,10 +1111,10 @@ function renderLiveDashboardStats(hostId) {
   if (user.role === 'staff') {
     const getStock = (name) => dataStore.products.find((p) => p.name.toLowerCase() === name.toLowerCase())?.stock || 0;
     renderStatCards(hostId, [
-      { label: 'Amoxicillin Stock', value: getStock('Amoxicillin'), icon: 'bi-capsule', bg: 'rgba(37,99,235,0.12)', color: '#2563eb', note: 'Staff limited view' },
-      { label: 'Ibuprofen Stock', value: getStock('Ibuprofen'), icon: 'bi-droplet', bg: 'rgba(22,163,74,0.14)', color: '#15803d', note: 'Staff limited view' },
-      { label: 'Cetirizine Stock', value: getStock('Cetirizine'), icon: 'bi-gear', bg: 'rgba(245,158,11,0.14)', color: '#d97706', note: 'Staff limited view' },
-      { label: 'Total Sales', value: peso(getStats().totalSales), icon: 'bi-cash-stack', bg: 'rgba(99,102,241,0.14)', color: '#4f46e5', note: 'Key staff reporting figure' }
+      { label: 'BP Monitor Stock', value: getStock('Digital BP Monitor'), icon: 'bi-heart-pulse', bg: 'rgba(37,99,235,0.12)', color: '#2563eb', note: 'Monitoring device supply' },
+      { label: 'Sugar Strips Stock', value: getStock('Glucometer Test Strips (50s)'), icon: 'bi-droplet-half', bg: 'rgba(22,163,74,0.14)', color: '#15803d', note: 'Sugar-check consumables' },
+      { label: 'Patient Bed Stock', value: getStock('Hospital Bed Mattress'), icon: 'bi-hospital', bg: 'rgba(245,158,11,0.14)', color: '#d97706', note: 'Bulky medical supplies' },
+      { label: 'Total Sales', value: peso(getStats().totalSales), icon: 'bi-cash-stack', bg: 'rgba(99,102,241,0.14)', color: '#4f46e5', note: 'All supply transactions' }
     ]);
     return;
   }
@@ -1560,6 +1560,12 @@ function renderPharmacist() {
 
 function renderStaff() {
   renderLiveDashboardStats('staffStats');
+  const bpCountValue = document.getElementById('bpCountValue');
+  const sugarCountValue = document.getElementById('sugarCountValue');
+  const todaySummary = getTodaySalesSummary();
+  if (bpCountValue) bpCountValue.textContent = String(12 + todaySummary.transactions);
+  if (sugarCountValue) sugarCountValue.textContent = String(9 + Math.max(1, Math.floor(todaySummary.transactions / 2)));
+
   const grid = document.getElementById('quickProductGrid');
   if (grid) {
     grid.innerHTML = dataStore.products.map((item) => `
