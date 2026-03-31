@@ -751,7 +751,7 @@ function getReportSections() {
     {
       key: 'expiration',
       title: 'Expiration Report',
-      description: 'Monitor soon-to-expire medicine batches',
+      description: 'Monitor soon-to-expire supply batches',
       tableHeadHtml: '<tr><th>Product</th><th>Expiration Date</th><th>Days Remaining</th><th>Recommended Action</th></tr>',
       tableBodyHtml: expirationRows
     },
@@ -1697,7 +1697,7 @@ function renderProducts() {
     }
 
     if (modalTitle) modalTitle.textContent = 'Add Product';
-    if (modalCaption) modalCaption.textContent = 'Create a new medicine record in the catalog.';
+    if (modalCaption) modalCaption.textContent = 'Create a new supply record in the catalog.';
     if (saveButton) saveButton.textContent = 'Save Product';
   };
 
@@ -2352,7 +2352,7 @@ function renderSales() {
     saveDataStore();
     document.getElementById('receiptContent').innerHTML = `
       <div class="text-center mb-3">
-        <h5 class="fw-bold mb-1">PharmaSys Pharmacy</h5>
+        <h5 class="fw-bold mb-1">PharmaSys Supplies</h5>
         <p class="text-muted mb-0">Receipt | ${new Date().toLocaleString()}</p>
       </div>
       <div class="d-grid gap-2 mb-3">
@@ -2365,7 +2365,7 @@ function renderSales() {
       <div class="d-flex justify-content-between"><span>Payment Method</span><span>${paymentMethod.toUpperCase()}</span></div>
       ${paymentMethod === 'cash' ? `<div class="d-flex justify-content-between"><span>Paid</span><span>${peso(payment)}</span></div>
       <div class="d-flex justify-content-between"><span>Change</span><span>${peso(payment - total)}</span></div>` : ''}
-      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>RX items dispensed - prescription verified.</div>' : ''}
+      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>Regulated items released - compliance check verified.</div>' : ''}
       <div class="alert alert-success border-0 rounded-4 mt-3 mb-0 text-center">Transaction completed successfully.</div>
     `;
     new bootstrap.Modal(document.getElementById('receiptModal')).show();
@@ -2452,7 +2452,7 @@ function renderSales() {
     saveDataStore();
     document.getElementById('receiptContent').innerHTML = `
       <div class="text-center mb-3">
-        <h5 class="fw-bold mb-1">PharmaSys Pharmacy</h5>
+        <h5 class="fw-bold mb-1">PharmaSys Supplies</h5>
         <p class="text-muted mb-0">Receipt ${receiptId} | ${new Date(createdAt).toLocaleString()}</p>
       </div>
       <div class="d-grid gap-2 mb-3">
@@ -2465,7 +2465,7 @@ function renderSales() {
       <div class="d-flex justify-content-between"><span>Payment Method</span><span>${paymentMethod.toUpperCase()}</span></div>
       ${paymentMethod === 'cash' ? `<div class="d-flex justify-content-between"><span>Paid</span><span>${peso(payment)}</span></div>
       <div class="d-flex justify-content-between"><span>Change</span><span>${peso(change)}</span></div>` : ''}
-      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>RX items dispensed - prescription verified.</div>' : ''}
+      ${rxItems ? '<div class="alert alert-warning border-0 rounded-3 mt-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i>Regulated items released - compliance check verified.</div>' : ''}
       <div class="alert alert-success border-0 rounded-4 mt-3 mb-0 text-center">Transaction completed successfully.</div>
     `;
     new bootstrap.Modal(document.getElementById('receiptModal')).show();
